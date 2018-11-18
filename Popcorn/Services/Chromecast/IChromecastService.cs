@@ -12,7 +12,7 @@ namespace Popcorn.Services.Chromecast
     public interface IChromecastService
     {
         Task<IEnumerable<IReceiver>> FindReceiversAsync();
-        Task LoadAsync(Media media);
+        Task LoadAsync(MediaInformation media, (bool hasSubtitle, int trackId) subtitle);
         Task<bool> ConnectAsync(IReceiver receiver);
         bool IsStopped { get; }
         bool IsMuted { get; }
@@ -22,7 +22,7 @@ namespace Popcorn.Services.Chromecast
         Task SeekAsync(double seconds);
         Task SetVolumeAsync(float volume);
         Task SetIsMutedAsync();
-        Task<IEnumerable<MediaStatus>> GetStatus();
+        Task<MediaStatus> GetStatus();
         event EventHandler<MediaStatusEventArgs> StatusChanged;
     }
 }

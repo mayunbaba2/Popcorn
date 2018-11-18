@@ -41,7 +41,7 @@ namespace Popcorn.Services.Chromecast
             await InvokeAsync<TChannel>(condition ? action : otherwise);
         }
 
-        public async Task<IEnumerable<MediaStatus>> GetStatus()
+        public async Task<MediaStatus> GetStatus()
         {
             try
             {
@@ -49,7 +49,7 @@ namespace Popcorn.Services.Chromecast
             }
             catch (Exception)
             {
-                return new List<MediaStatus>();
+                return new MediaStatus();
             }
         }
 
@@ -81,7 +81,7 @@ namespace Popcorn.Services.Chromecast
             }
         }
 
-        public async Task LoadAsync(Media media)
+        public async Task LoadAsync(MediaInformation media, (bool hasSubtitle, int trackId) subtitle)
         {
             await SendChannelCommandAsync<IMediaChannel>(!IsInitialized || IsStopped,
                 async c =>
@@ -93,7 +93,14 @@ namespace Popcorn.Services.Chromecast
                             var sender = Sender;
                             var mediaChannel = sender.GetChannel<IMediaChannel>();
                             await sender.LaunchAsync(mediaChannel);
-                            await mediaChannel.LoadAsync(media);
+                            if (subtitle.hasSubtitle)
+                            {
+                                await mediaChannel.LoadAsync(media, true, subtitle.trackId);
+                            }
+                            else
+                            {
+                                await mediaChannel.LoadAsync(media);
+                            }
                             IsInitialized = true;
                         }
                     }
